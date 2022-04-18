@@ -1,53 +1,24 @@
 # Memcached
 
-Memcached is a high performance multithreaded event-based key/value cache
-store intended to be used in a distributed system.
+This is a forked version of memcached to complete the challenge described in
+Arthur O'Dwyer's blog post https://quuxplusone.github.io/blog/2022/01/06/memcached-interview/
 
-See: https://memcached.org/about
+The challenge?
 
-A fun story explaining usage: https://memcached.org/tutorial
+```
+Add a mult command to memcached
 
-If you're having trouble, try the wiki: https://memcached.org/wiki
+Example
 
-If you're trying to troubleshoot odd behavior or timeouts, see:
-https://memcached.org/timeouts
+set age 0 2
+38
+STORED
+mult age 2
+76
+```
+## Results
 
-https://memcached.org/ is a good resource in general. Please use the mailing
-list to ask questions, github issues aren't seen by everyone!
+It took me 29min 42sec to get a working version, including checkout, compilation, code changes, and testing.
+I didn't add statistics, and I left a few TODOs. Oh, and I spelled the command "mul" instead
+of "mult". "mult" is just too molty, you know?
 
-## Dependencies
-
-* libevent - https://www.monkey.org/~provos/libevent/ (libevent-dev)
-* libseccomp (optional, experimental, linux) - enables process restrictions for
-  better security. Tested only on x86-64 architectures.
-* openssl (optional) - enables TLS support. need relatively up to date
-  version.
-
-## Environment
-
-Be warned that the -k (mlockall) option to memcached might be
-dangerous when using a large cache. Just make sure the memcached machines
-don't swap.  memcached does non-blocking network I/O, but not disk.  (it
-should never go to disk, or you've lost the whole point of it)
-
-## Build status
-
-See https://build.memcached.org/ for multi-platform regression testing status.
-
-## Bug reports
-
-Feel free to use the issue tracker on github.
-
-**If you are reporting a security bug** please contact a maintainer privately.
-We follow responsible disclosure: we handle reports privately, prepare a
-patch, allow notifications to vendor lists. Then we push a fix release and your
-bug can be posted publicly with credit in our release notes and commit
-history.
-
-## Website
-
-* https://www.memcached.org
-
-## Contributing
-
-See https://github.com/memcached/memcached/wiki/DevelopmentRepos

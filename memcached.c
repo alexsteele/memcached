@@ -2219,7 +2219,8 @@ item* limited_get_locked(char *key, size_t nkey, conn *c, bool do_update, uint32
  * returns a response string to send back to the client.
  */
 enum delta_result_type do_add_delta(conn *c, const char *key, const size_t nkey,
-                                    const bool incr, const int64_t delta,
+                                    enum arith_cmd cmd,
+                                    const int64_t delta,
                                     char *buf, uint64_t *cas,
                                     const uint32_t hv,
                                     item **it_ret) {
@@ -2256,22 +2257,29 @@ enum delta_result_type do_add_delta(conn *c, const char *key, const size_t nkey,
         return NON_NUMERIC;
     }
 
-    if (incr) {
+    if (cmd == ARITH_MUL) {
+        value *= delta;
+        // TODO: trace!
+        // TODO: overflow check?
+    } else if (cmd == ARITH_INCR) {
         value += delta;
         MEMCACHED_COMMAND_INCR(c->sfd, ITEM_key(it), it->nkey, value);
-    } else {
+    } else if (cmd == ARITH_DECR) {
         if(delta > value) {
             value = 0;
         } else {
             value -= delta;
         }
         MEMCACHED_COMMAND_DECR(c->sfd, ITEM_key(it), it->nkey, value);
+    } else {
+        assert(false && "bad command");
     }
 
+    // TODO: add mul stats
     pthread_mutex_lock(&c->thread->stats.mutex);
-    if (incr) {
+    if (cmd == ARITH_INCR) {
         c->thread->stats.slab_stats[ITEM_clsid(it)].incr_hits++;
-    } else {
+    } else if (cmd == ARITH_DECR) {
         c->thread->stats.slab_stats[ITEM_clsid(it)].decr_hits++;
     }
     pthread_mutex_unlock(&c->thread->stats.mutex);

@@ -294,7 +294,8 @@ static void complete_incr_bin(conn *c, char *extbuf) {
     if (c->binary_header.request.cas != 0) {
         cas = c->binary_header.request.cas;
     }
-    switch(add_delta(c, key, nkey, c->cmd == PROTOCOL_BINARY_CMD_INCREMENT,
+    // TODO: support mul
+    switch(add_delta(c, key, nkey, c->cmd == PROTOCOL_BINARY_CMD_INCREMENT ? ARITH_INCR : ARITH_DECR,
                      req->message.body.delta, tmpbuf,
                      &cas)) {
     case OK:
